@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ImageTranslate</string>
+    <string name="LanguageList">LanguageList</string>
+    <string name="what_s_your_native_langauge">What\'s Your Native Langauge ?</string>
+</resources>
