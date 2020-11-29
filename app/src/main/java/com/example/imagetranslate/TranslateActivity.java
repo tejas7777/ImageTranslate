@@ -270,6 +270,165 @@ public class TranslateActivity extends AppCompatActivity {
 
     }
 
+private void getLastLocation()
+    {
+        // check if permissions are given
+        if (checkPermissions()) {
+
+            // check if location is enabled
+            if (isLocationEnabled()) {
+
+                // getting last
+                // location from
+                // FusedLocationClient
+                // object
+                mFusedLocationClient
+                        .getLastLocation()
+                        .addOnCompleteListener(
+                                new OnCompleteListener<Location>() {
+
+                                    @Override
+                                    public void onComplete(
+                                            @NonNull Task<Location> task)
+                                    {
+                                        Location location = task.getResult();
+                                        if (location == null) {
+                                            requestNewLocationData();
+                                        }
+                                        else {
+                                            latTextView
+                                                    .setText(
+                                                            location
+                                                                    .getLatitude()
+                                                                    + "");
+                                            lonTextView
+                                                    .setText(
+                                                            location
+                                                                    .getLongitude()
+                                                                    + "");
+                                        }
+                                    }
+                                });
+            }
+
+            else {
+                Toast
+                        .makeText(
+                                this,
+                                "Please turn on"
+                                        + " your location...",
+                                Toast.LENGTH_LONG)
+                        .show();
+
+                Intent intent
+                        = new Intent(
+                        Settings
+                                .ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+        }
+        else {
+            // if permissions aren't available,
+            // request for permissions
+            requestPermissions();
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void requestNewLocationData()
+    {
+
+        // Initializing LocationRequest
+        // object with appropriate methods
+        LocationRequest mLocationRequest
+                = new LocationRequest();
+        mLocationRequest.setPriority(
+                LocationRequest
+                        .PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(5);
+        mLocationRequest.setFastestInterval(0);
+        mLocationRequest.setNumUpdates(1);
+
+        // setting LocationRequest
+        // on FusedLocationClient
+        mFusedLocationClient
+                = LocationServices
+                .getFusedLocationProviderClient(this);
+
+        mFusedLocationClient
+                .requestLocationUpdates(
+                        mLocationRequest,
+                        mLocationCallback,
+                        Looper.myLooper());
+    }
+
+    private LocationCallback
+            mLocationCallback
+            = new LocationCallback() {
+
+        @Override
+        public void onLocationResult(
+                LocationResult locationResult)
+        {
+            Location mLastLocation
+                    = locationResult
+                    .getLastLocation();
+            latTextView
+                    .setText(
+                            "Latitude: "
+                                    + mLastLocation
+                                    .getLatitude()
+                                    + "");
+            lonTextView
+                    .setText(
+                            "Longitude: "
+                                    + mLastLocation
+                                    .getLongitude()
+                                    + "");
+        }
+    };
+
+    // method to check for permissions
+    private boolean checkPermissions()
+    {
+        return ActivityCompat
+                .checkSelfPermission(
+                        this,
+                        Manifest.permission
+                                .ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED
+
+                && ActivityCompat
+                .checkSelfPermission(
+                        this,
+                        Manifest.permission
+                                .ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
+
+        // If we want background location
+        // on Android 10.0 and higher,
+        // use:
+        /* ActivityCompat
+                .checkSelfPermission(
+                    this,
+                    Manifest.permission
+                        .ACCESS_BACKGROUND_LOCATION)
+            == PackageManager.PERMISSION_GRANTED
+        */
+    }
+
+    // method to requestfor permissions
+    private void requestPermissions()
+    {
+        ActivityCompat.requestPermissions(
+                this,
+                new String[] {
+                        Manifest.permission
+                                .ACCESS_COARSE_LOCATION,
+                        Manifest.permission
+                                .ACCESS_FINE_LOCATION },
+                PERMISSION_ID);
+    }
 
 
 
